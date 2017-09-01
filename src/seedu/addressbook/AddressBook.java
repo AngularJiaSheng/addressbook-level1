@@ -33,6 +33,22 @@ import java.util.Set;
 /**
  * This class is used to maintain a list of person data which are saved
  * in a text file.
+ * Hi, for the 1kLOC i did, i realize that I will not be able to pass most of the test cases, as I added workspace.
+ Please use the following input for add:
+ add John Doe p/98765432 e/johnd@gmail.com w/NUS
+
+ Expected output
+ || ===================================================
+ || ===================================================
+ || AddessBook Level 1 - Version 1.0
+ || Welcome to your Address Book!
+ || ===================================================
+ || Using default storage file : addressbook.txt
+ || Enter command: add John Doe p/98765432 e/johnd@gmail.com w/NUS
+ || [Command entered:add John Doe p/98765432 e/johnd@gmail.com w/NUS]
+ || New person added: John Doe, Phone: 98765432, Email: johnd@gmail.com , Workplace: NUS
+ || ===================================================
+ || Enter command:
  **/
 public class AddressBook {
 
