@@ -975,10 +975,10 @@ public class AddressBook {
     private static boolean isPersonDataExtractableFrom(String personData) {
         final String matchAnyPersonDataPrefix = PERSON_DATA_PREFIX_PHONE + '|' + PERSON_DATA_PREFIX_EMAIL + '|' + PERSON_DATA_PREFIX_WORKPLACE;
         final String[] splitArgs = personData.trim().split(matchAnyPersonDataPrefix);
-        return checkIfAllDataFieldValid(splitArgs);
+        return IfAllDataFieldValid(splitArgs);
     }
 
-    private static boolean checkIfAllDataFieldValid(String[] args){
+    private static boolean IfAllDataFieldValid(String[] args){
         return args.length == 4 // 4 arguments
                 && !args[0].isEmpty() // non-empty arguments
                 && !args[1].isEmpty()
