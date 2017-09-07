@@ -33,6 +33,22 @@ import java.util.Set;
 /**
  * This class is used to maintain a list of person data which are saved
  * in a text file.
+ * Hi, for the 1kLOC i did, i realize that I will not be able to pass most of the test cases, as I added workspace.
+ Please use the following input for add:
+ add John Doe p/98765432 e/johnd@gmail.com w/NUS
+
+ Expected output
+ || ===================================================
+ || ===================================================
+ || AddessBook Level 1 - Version 1.0
+ || Welcome to your Address Book!
+ || ===================================================
+ || Using default storage file : addressbook.txt
+ || Enter command: add John Doe p/98765432 e/johnd@gmail.com w/NUS
+ || [Command entered:add John Doe p/98765432 e/johnd@gmail.com w/NUS]
+ || New person added: John Doe, Phone: 98765432, Email: johnd@gmail.com , Workplace: NUS
+ || ===================================================
+ || Enter command:
  **/
 public class AddressBook {
 
@@ -65,13 +81,13 @@ public class AddressBook {
      * at which java String.format(...) method can insert values.
      * =========================================================================
      */
-    private static final String MESSAGE_ADDED = "New person added: %1$s, Phone: %2$s, Email: %3$s";
+    private static final String MESSAGE_ADDED = "New person added: %1$s, Phone: %2$s, Email: %3$s, Workplace: %4$s";
     private static final String MESSAGE_ADDRESSBOOK_CLEARED = "Address book has been cleared!";
     private static final String MESSAGE_COMMAND_HELP = "%1$s: %2$s";
     private static final String MESSAGE_COMMAND_HELP_PARAMETERS = "\tParameters: %1$s";
     private static final String MESSAGE_COMMAND_HELP_EXAMPLE = "\tExample: %1$s";
     private static final String MESSAGE_DELETE_PERSON_SUCCESS = "Deleted Person: %1$s";
-    private static final String MESSAGE_DISPLAY_PERSON_DATA = "%1$s  Phone Number: %2$s  Email: %3$s";
+    private static final String MESSAGE_DISPLAY_PERSON_DATA = "%1$s  Phone Number: %2$s  Email: %3$s  Workplace: %4$s";
     private static final String MESSAGE_DISPLAY_LIST_ELEMENT_INDEX = "%1$d. ";
     private static final String MESSAGE_GOODBYE = "Exiting Address Book... Good bye!";
     private static final String MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format: %1$s " + LS + "%2$s";
@@ -94,16 +110,18 @@ public class AddressBook {
     // These are the prefix strings to define the data type of a command parameter
     private static final String PERSON_DATA_PREFIX_PHONE = "p/";
     private static final String PERSON_DATA_PREFIX_EMAIL = "e/";
+    private static final String PERSON_DATA_PREFIX_WORKPLACE = "w/";
 
     private static final String PERSON_STRING_REPRESENTATION = "%1$s " // name
                                                             + PERSON_DATA_PREFIX_PHONE + "%2$s " // phone
-                                                            + PERSON_DATA_PREFIX_EMAIL + "%3$s"; // email
+                                                            + PERSON_DATA_PREFIX_EMAIL + "%3$s"
+                                                            + PERSON_DATA_PREFIX_WORKPLACE + "%4$s"; // email
     private static final String COMMAND_ADD_WORD = "add";
     private static final String COMMAND_ADD_DESC = "Adds a person to the address book.";
     private static final String COMMAND_ADD_PARAMETERS = "NAME "
                                                       + PERSON_DATA_PREFIX_PHONE + "PHONE_NUMBER "
-                                                      + PERSON_DATA_PREFIX_EMAIL + "EMAIL";
-    private static final String COMMAND_ADD_EXAMPLE = COMMAND_ADD_WORD + " John Doe p/98765432 e/johnd@gmail.com";
+                                                      + PERSON_DATA_PREFIX_EMAIL + "EMAIL " + PERSON_DATA_PREFIX_WORKPLACE + "WORKPLACE";
+    private static final String COMMAND_ADD_EXAMPLE = COMMAND_ADD_WORD + " John Doe p/98765432 e/johnd@gmail.com w/NUS";
 
     private static final String COMMAND_FIND_WORD = "find";
     private static final String COMMAND_FIND_DESC = "Finds all persons whose names contain any of the specified "
@@ -144,11 +162,12 @@ public class AddressBook {
     private static final int PERSON_DATA_INDEX_NAME = 0;
     private static final int PERSON_DATA_INDEX_PHONE = 1;
     private static final int PERSON_DATA_INDEX_EMAIL = 2;
+    private static final int PERSON_DATA_INDEX_WORKPLACE = 3;
 
     /**
      * The number of data elements for a single person.
      */
-    private static final int PERSON_DATA_COUNT = 3;
+    private static final int PERSON_DATA_COUNT = 4;
 
     /**
      * Offset required to convert between 1-indexing and 0-indexing.COMMAND_
@@ -208,7 +227,18 @@ public class AddressBook {
 
     public static void main(String[] args) {
         showWelcomeMessage();
-        processProgramArgs(args);
+        if (args.length >= 2) {
+            showToUser(MESSAGE_INVALID_PROGRAM_ARGS);
+            exitProgram();
+        }
+
+        if (args.length == 1) {
+            setupGivenFileForStorage(args[0]);
+        }
+
+        if(args.length == 0) {
+            setupDefaultFileForStorage();
+        }
         loadDataFromStorage();
         while (true) {
             String userCommand = getUserInput();
@@ -256,20 +286,7 @@ public class AddressBook {
      *
      * @param args full program arguments passed to application main method
      */
-    private static void processProgramArgs(String[] args) {
-        if (args.length >= 2) {
-            showToUser(MESSAGE_INVALID_PROGRAM_ARGS);
-            exitProgram();
-        }
 
-        if (args.length == 1) {
-            setupGivenFileForStorage(args[0]);
-        }
-
-        if(args.length == 0) {
-            setupDefaultFileForStorage();
-        }
-    }
 
     /**
      * Sets up the storage file based on the supplied file path.
@@ -385,6 +402,7 @@ public class AddressBook {
             executeExitProgramRequest();
         default:
             return getMessageForInvalidCommandInput(commandType, getUsageInfoForAllCommands());
+
         }
     }
 
@@ -421,6 +439,7 @@ public class AddressBook {
 
         // checks if args are valid (decode result will not be present if the person is invalid)
         if (!decodeResult.isPresent()) {
+
             return getMessageForInvalidCommandInput(COMMAND_ADD_WORD, getUsageInfoForAddCommand());
         }
 
@@ -439,7 +458,7 @@ public class AddressBook {
      */
     private static String getMessageForSuccessfulAddPerson(String[] addedPerson) {
         return String.format(MESSAGE_ADDED,
-                getNameFromPerson(addedPerson), getPhoneFromPerson(addedPerson), getEmailFromPerson(addedPerson));
+                getNameFromPerson(addedPerson), getPhoneFromPerson(addedPerson), getEmailFromPerson(addedPerson), getWorkplaceFromPerson(addedPerson));
     }
 
     /**
@@ -669,7 +688,7 @@ public class AddressBook {
      */
     private static String getMessageForFormattedPersonData(String[] person) {
         return String.format(MESSAGE_DISPLAY_PERSON_DATA,
-                getNameFromPerson(person), getPhoneFromPerson(person), getEmailFromPerson(person));
+                getNameFromPerson(person), getPhoneFromPerson(person), getEmailFromPerson(person), getWorkplaceFromPerson(person));
     }
 
     /**
@@ -859,6 +878,15 @@ public class AddressBook {
     private static String getEmailFromPerson(String[] person) {
         return person[PERSON_DATA_INDEX_EMAIL];
     }
+    /**
+     * Returns given person's email
+     *
+     * @param person whose workplace  you want
+     */
+
+    private static String getWorkplaceFromPerson(String[] person) {
+        return person[PERSON_DATA_INDEX_WORKPLACE];
+    }
 
     /**
      * Creates a person from the given data.
@@ -868,11 +896,12 @@ public class AddressBook {
      * @param email without data prefix
      * @return constructed person
      */
-    private static String[] makePersonFromData(String name, String phone, String email) {
+    private static String[] makePersonFromData(String name, String phone, String email, String workplace) {
         final String[] person = new String[PERSON_DATA_COUNT];
         person[PERSON_DATA_INDEX_NAME] = name;
         person[PERSON_DATA_INDEX_PHONE] = phone;
         person[PERSON_DATA_INDEX_EMAIL] = email;
+        person[PERSON_DATA_INDEX_WORKPLACE] = workplace;
         return person;
     }
 
@@ -884,7 +913,7 @@ public class AddressBook {
      */
     private static String encodePersonToString(String[] person) {
         return String.format(PERSON_STRING_REPRESENTATION,
-                getNameFromPerson(person), getPhoneFromPerson(person), getEmailFromPerson(person));
+                getNameFromPerson(person), getPhoneFromPerson(person), getEmailFromPerson(person), getWorkplaceFromPerson(person));
     }
 
     /**
@@ -918,14 +947,17 @@ public class AddressBook {
     private static Optional<String[]> decodePersonFromString(String encoded) {
         // check that we can extract the parts of a person from the encoded string
         if (!isPersonDataExtractableFrom(encoded)) {
+
             return Optional.empty();
         }
         final String[] decodedPerson = makePersonFromData(
                 extractNameFromPersonString(encoded),
                 extractPhoneFromPersonString(encoded),
-                extractEmailFromPersonString(encoded)
+                extractEmailFromPersonString(encoded),
+                extractWorkplaceFromPersonString(encoded)
         );
         // check that the constructed person is valid
+        //System.out.println("**********************************2" + isPersonDataValid(decodedPerson));
         return isPersonDataValid(decodedPerson) ? Optional.of(decodedPerson) : Optional.empty();
     }
 
@@ -950,17 +982,22 @@ public class AddressBook {
 
     /**
      * Returns true if person data (email, name, phone etc) can be extracted from the argument string.
-     * Format is [name] p/[phone] e/[email], phone and email positions can be swapped.
+     * Format is [name] p/[phone] e/[email]. t/[workplace], phone and email positions can be swapped.
      *
      * @param personData person string representation
      */
     private static boolean isPersonDataExtractableFrom(String personData) {
-        final String matchAnyPersonDataPrefix = PERSON_DATA_PREFIX_PHONE + '|' + PERSON_DATA_PREFIX_EMAIL;
+        final String matchAnyPersonDataPrefix = PERSON_DATA_PREFIX_PHONE + '|' + PERSON_DATA_PREFIX_EMAIL + '|' + PERSON_DATA_PREFIX_WORKPLACE;
         final String[] splitArgs = personData.trim().split(matchAnyPersonDataPrefix);
-        return splitArgs.length == 3 // 3 arguments
-                && !splitArgs[0].isEmpty() // non-empty arguments
-                && !splitArgs[1].isEmpty()
-                && !splitArgs[2].isEmpty();
+        return IfAllDataFieldValid(splitArgs);
+    }
+
+    private static boolean IfAllDataFieldValid(String[] args){
+        return args.length == 4 // 4 arguments
+                && !args[0].isEmpty() // non-empty arguments
+                && !args[1].isEmpty()
+                && !args[2].isEmpty()
+                && !args[3].isEmpty();
     }
 
     /**
@@ -1000,6 +1037,16 @@ public class AddressBook {
         }
     }
 
+    private static String extractWorkplaceFromPersonString(String encoded) {
+        final int indexOfWorkplacePrefix = encoded.indexOf(PERSON_DATA_PREFIX_WORKPLACE);
+
+        // name is leading substring up to first data prefix symbol
+
+        return removePrefixSign(encoded.substring(indexOfWorkplacePrefix, encoded.length()).trim(),
+                PERSON_DATA_PREFIX_WORKPLACE);
+    }
+
+
     /**
      * Extracts substring representing email from person string representation
      *
@@ -1009,10 +1056,11 @@ public class AddressBook {
     private static String extractEmailFromPersonString(String encoded) {
         final int indexOfPhonePrefix = encoded.indexOf(PERSON_DATA_PREFIX_PHONE);
         final int indexOfEmailPrefix = encoded.indexOf(PERSON_DATA_PREFIX_EMAIL);
+        final int indexOfWorkplacePrefix = encoded.indexOf(PERSON_DATA_PREFIX_WORKPLACE);
 
         // email is last arg, target is from prefix to end of string
         if (indexOfEmailPrefix > indexOfPhonePrefix) {
-            return removePrefixSign(encoded.substring(indexOfEmailPrefix, encoded.length()).trim(),
+            return removePrefixSign(encoded.substring(indexOfEmailPrefix, indexOfWorkplacePrefix),
                     PERSON_DATA_PREFIX_EMAIL);
 
         // email is middle arg, target is from own prefix to next prefix
@@ -1028,10 +1076,13 @@ public class AddressBook {
      *
      * @param person String array representing the person (used in internal data)
      */
-    private static boolean isPersonDataValid(String[] person) {
+    private static boolean isPersonDataValid(String[] person) { //****************************************************************************************************************************************************
+        //System.out.println("Check this:" + person[PERSON_DATA_INDEX_EMAIL]);
+        //System.out.println("Check this:" + person[PERSON_DATA_INDEX_WORKPLACE]);
         return isPersonNameValid(person[PERSON_DATA_INDEX_NAME])
                 && isPersonPhoneValid(person[PERSON_DATA_INDEX_PHONE])
-                && isPersonEmailValid(person[PERSON_DATA_INDEX_EMAIL]);
+                && isPersonEmailValid(person[PERSON_DATA_INDEX_EMAIL])
+                && isPersonWorkplaceValid(person[PERSON_DATA_INDEX_WORKPLACE]);
     }
 
     /*
@@ -1069,11 +1120,20 @@ public class AddressBook {
      * @return whether arg is a valid person email
      */
     private static boolean isPersonEmailValid(String email) {
-        return email.matches("\\S+@\\S+\\.\\S+"); // email is [non-whitespace]@[non-whitespace].[non-whitespace]
+        return true;
+        //return email.matches("(\\w|\\s)+"); // email is [non-whitespace]@[non-whitespace].[non-whitespace]
         //TODO: implement a more permissive validation
     }
-
-
+    /**
+     * Returns true if the given string is a legal person email
+     *
+     * @param workplace to be validated
+     * @return whether arg is a valid person email
+     */
+    private static boolean isPersonWorkplaceValid(String workplace) {
+        return workplace.matches("(\\w|\\s)+"); // workplace is nonempty mixture of alphabets and whitespace
+        //TODO: implement a more permissive validation
+    }
     /*
      * ===============================================
      *         COMMAND HELP INFO FOR USERS
@@ -1146,12 +1206,12 @@ public class AddressBook {
     /**
      * Removes sign(p/, d/, etc) from parameter string
      *
-     * @param s  Parameter as a string
-     * @param sign  Parameter sign to be removed
+     * @param fullString  Parameter as a string
+     * @param prefix  Parameter sign to be removed
      * @return  string without the sign
      */
-    private static String removePrefixSign(String s, String sign) {
-        return s.replace(sign, "");
+    private static String removePrefixSign(String fullString, String prefix) {
+        return fullString.replace(prefix, "");
     }
 
     /**
